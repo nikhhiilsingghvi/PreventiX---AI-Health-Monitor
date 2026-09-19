@@ -123,7 +123,7 @@ def generate_health_report_pdf(prediction_data: Dict[str, Any], user_info: Dict[
         ['Hypertension', f"{hypertension_risk:.1f}%", '32%', get_risk_status(hypertension_risk), get_priority_level(hypertension_risk)]
     ]
     
-    risk_table = Table(risk_data, colWidths=[1.5*inch, 1.2*inch, 1.2*inch, 1.8*inch])
+    risk_table = Table(risk_data, colWidths=[1.5*inch, 1.2*inch, 1.2*inch, 1.2*inch, 1.2*inch])
     risk_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -138,20 +138,7 @@ def generate_health_report_pdf(prediction_data: Dict[str, Any], user_info: Dict[
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
     ]))
     
-    risk_table = Table(risk_data, colWidths=[1.4*inch, 1.2*inch, 1.2*inch, 1.2*inch, 1.0*inch])
-    risk_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 11),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
-    ]))
+
     
     elements.append(risk_table)
     elements.append(Spacer(1, 0.3*inch))
