@@ -148,7 +148,7 @@ export const predictionAPI = {
   },  
     downloadPDF: async (healthData) => {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/predict/current-pdf`, {
+      const response = await fetch(`${API_BASE_URL.replace(/\/+$/, '')}/predict/current-pdf`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -102,7 +102,8 @@ const AssessmentHistory = () => {
       }
       
       // Call the PDF download API directly
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/predict/current-pdf`, {
+      const baseUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
+      const response = await fetch(`${baseUrl}/predict/current-pdf`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
