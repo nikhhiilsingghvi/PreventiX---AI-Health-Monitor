@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
-from bson import ObjectId
+
 import os
 import logging
 
@@ -85,7 +85,7 @@ def get_current_active_user(token: str = Depends(oauth2_scheme)) -> dict:
     users_collection = get_users_collection()
     
     try:
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        user = users_collection.find_one({"_id": user_id})
         
         if user is None:
             logger.error(f"User not found in database: {user_id}")

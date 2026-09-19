@@ -24,7 +24,7 @@ from pdf_generator import generate_health_report_pdf
 load_dotenv()
 
 # Import MongoDB components
-from database import get_predictions_collection, get_tracking_collection, mongodb_client
+from database import get_predictions_collection, get_tracking_collection
 from auth_routes import router as auth_router
 from auth import get_current_active_user
 from models import PredictionRecord, TrackingRecord

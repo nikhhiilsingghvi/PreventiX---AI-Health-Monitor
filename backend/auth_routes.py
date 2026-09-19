@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from datetime import datetime
-from bson import ObjectId
 import logging
 
 from models import UserRegister, UserLogin, Token, UserResponse
@@ -142,12 +141,12 @@ def update_user_profile(  # Changed to def
     if gender:
         update_data["gender"] = gender
     
-    users_collection.update_one(  # Removed await
-        {"_id": ObjectId(current_user["id"])},  # Fixed: use "id"
+    users_collection.update_one(
+        {"_id": int(current_user["id"])},
         {"$set": update_data}
     )
     
-    updated_user = users_collection.find_one({"_id": ObjectId(current_user["id"])})  # Removed await
+    updated_user = users_collection.find_one({"_id": int(current_user["id"])})
     
     return UserResponse(
         id=str(updated_user["_id"]),
@@ -175,7 +174,7 @@ def refresh_token(refresh_token: str):
         
         # Verify user still exists
         users_collection = get_users_collection()
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        user = users_collection.find_one({"_id": int(user_id)})
         
         if not user or not user.get("is_active", True):
             raise HTTPException(
