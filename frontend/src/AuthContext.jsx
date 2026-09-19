@@ -44,7 +44,10 @@ export const AuthProvider = ({ children }) => {
       toast.success('Registration successful! Welcome to PreventiX');
       return response;
     } catch (error) {
-      const message = error.response?.data?.detail || 'Registration failed';
+      const detail = error.response?.data?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map(e => e.msg).join(', ')   // Pydantic v2 validation errors
+        : (typeof detail === 'string' ? detail : 'Registration failed');
       toast.error(message);
       throw error;
     } finally {
@@ -61,7 +64,10 @@ export const AuthProvider = ({ children }) => {
       toast.success('Login successful! Welcome back');
       return response;
     } catch (error) {
-      const message = error.response?.data?.detail || 'Login failed';
+      const detail = error.response?.data?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map(e => e.msg).join(', ')   // Pydantic v2 validation errors
+        : (typeof detail === 'string' ? detail : 'Login failed. Please check your credentials.');
       toast.error(message);
       throw error;
     } finally {
@@ -83,7 +89,10 @@ export const AuthProvider = ({ children }) => {
       toast.success('Profile updated successfully');
       return response;
     } catch (error) {
-      const message = error.response?.data?.detail || 'Profile update failed';
+      const detail = error.response?.data?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map(e => e.msg).join(', ')
+        : (typeof detail === 'string' ? detail : 'Profile update failed');
       toast.error(message);
       throw error;
     }
