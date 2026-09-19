@@ -137,7 +137,10 @@ class _SQLCollection:
             q = db.query(self._model)
             for key, value in query.items():
                 if key == "_id":
-                    q = q.filter(self._model.id == int(value))
+                    try:
+                        q = q.filter(self._model.id == int(value))
+                    except ValueError:
+                        return None
                 else:
                     q = q.filter(getattr(self._model, key) == value)
             obj = q.first()
@@ -165,7 +168,10 @@ class _SQLCollection:
             q = db.query(self._model)
             for key, value in query.items():
                 if key == "_id":
-                    q = q.filter(self._model.id == int(value))
+                    try:
+                        q = q.filter(self._model.id == int(value))
+                    except ValueError:
+                        return
                 else:
                     q = q.filter(getattr(self._model, key) == value)
             obj = q.first()
