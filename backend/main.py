@@ -3683,14 +3683,14 @@ async def get_recent_assessments(limit: int = 10, current_user: dict = Depends(g
         logger.info("Fetching recent assessments")
         predictions_collection = get_predictions_collection()
         
-        # Fetch recent assessments for the authenticated user
         logger.info(f"Searching for assessments for user: {current_user['id']}")
         
-        recent_assessments = list(predictions_collection.find(
-            {"user_id": current_user["id"]},
-            sort=[("created_at", -1)],
-            limit=limit
-        ))
+        # Use chained .sort().limit() — compatible with SQLAlchemy _Cursor wrapper
+        recent_assessments = list(
+            predictions_collection.find({"user_id": current_user["id"]})
+            .sort("created_at", -1)
+            .limit(limit)
+        )
         
         logger.info(f"Found {len(recent_assessments)} assessments")
         
@@ -3698,20 +3698,24 @@ async def get_recent_assessments(limit: int = 10, current_user: dict = Depends(g
             logger.info("No assessments found")
             return []
         
-        # Format the data for response
         formatted_assessments = []
         for assessment in recent_assessments:
-            logger.info(f"Processing assessment {assessment.get('_id')} with input_data: {assessment.get('input_data')}")
-            # Calculate overall score (average of metabolic and cardiovascular scores)
-            metabolic_score = assessment.get("metabolic_health_score", 0)
-            cardiovascular_score = assessment.get("cardiovascular_health_score", 0)
+            metabolic_score = assessment.get("metabolic_health_score", 0) or 0
+            cardiovascular_score = assessment.get("cardiovascular_health_score", 0) or 0
             overall_score = round((metabolic_score + cardiovascular_score) / 2, 1)
             
+            # Handle created_at as datetime or string
+            created_at = assessment.get("created_at")
+            if hasattr(created_at, "strftime"):
+                date_str = created_at.strftime("%Y-%m-%d")
+            else:
+                date_str = str(created_at)[:10] if created_at else "Unknown"
+            
             formatted_assessment = RecentAssessment(
-                id=str(assessment["_id"]),
-                date=assessment["created_at"].strftime("%Y-%m-%d"),
-                diabetes_risk=round(assessment.get("diabetes_risk", 0) * 100, 1),
-                hypertension_risk=round(assessment.get("hypertension_risk", 0) * 100, 1),
+                id=str(assessment.get("_id", assessment.get("id", ""))),
+                date=date_str,
+                diabetes_risk=round((assessment.get("diabetes_risk", 0) or 0) * 100, 1),
+                hypertension_risk=round((assessment.get("hypertension_risk", 0) or 0) * 100, 1),
                 metabolic_health_score=round(metabolic_score, 1),
                 cardiovascular_health_score=round(cardiovascular_score, 1),
                 overall_score=overall_score,
@@ -3722,7 +3726,6 @@ async def get_recent_assessments(limit: int = 10, current_user: dict = Depends(g
             formatted_assessments.append(formatted_assessment)
         
         logger.info(f"Retrieved {len(formatted_assessments)} recent assessments")
-        logger.info(f"Sample assessment input_data: {formatted_assessments[0].input_data if formatted_assessments else 'No assessments'}")
         return formatted_assessments
         
     except Exception as e:
