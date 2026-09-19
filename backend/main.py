@@ -16,7 +16,6 @@ import random
 import os
 import re
 from dotenv import load_dotenv
-from bson import ObjectId
 from fastapi.responses import StreamingResponse
 from pdf_generator import generate_health_report_pdf
 
