@@ -2471,10 +2471,10 @@ async def download_current_prediction_pdf(
             logger.info("PDF generated successfully")
         except Exception as pdf_error:
             logger.error(f"Error in generate_health_report_pdf: {pdf_error}")
-            logger.error(f"PDF error type: {type(pdf_error)}")
             import traceback
-            logger.error(f"PDF generation traceback: {traceback.format_exc()}")
-            raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(pdf_error)}")
+            full_trace = traceback.format_exc()
+            logger.error(f"PDF generation traceback: {full_trace}")
+            raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(pdf_error)} | Trace: {full_trace}")
         
         filename = f"health_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
         
@@ -2487,8 +2487,10 @@ async def download_current_prediction_pdf(
         )
         
     except Exception as e:
-        logger.error(f"Error generating PDF: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)}")
+        import traceback
+        full_trace = traceback.format_exc()
+        logger.error(f"Error generating PDF: {e}\n{full_trace}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)} | Trace: {full_trace}")
 
 def analyze_health_question(question: str, health_data: Dict[str, Any], prediction_result: Dict[str, Any] = None) -> HealthAnswer:
     """AI-powered analysis of health questions based on user's specific health data"""
