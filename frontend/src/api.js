@@ -17,7 +17,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log('Request headers:', config.headers); // DEBUG
+
     return config;
   },
   (error) => {
@@ -82,7 +82,9 @@ export const authAPI = {
     const response = await api.post('/auth/login', credentials);
     if (response.data.access_token) {
       localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('refreshToken', response.data.access_token); // Use same token as refresh for simplicity
+      if (response.data.refresh_token) {
+        localStorage.setItem('refreshToken', response.data.refresh_token);
+      }
       localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     return response.data;

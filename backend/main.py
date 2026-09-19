@@ -30,19 +30,22 @@ from auth import get_current_active_user
 from models import PredictionRecord, TrackingRecord
 from tracking_routes import router as tracking_router
 
-# Initialize FastAPI app
+# Configure logging first (used in exception handler below)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI app (single instance)
 app = FastAPI(
-    title="PreventiX Advanced API - Optimized",
-    description="AI-powered health risk prediction with personalized recommendations (Anti-overfitting optimized)",
+    title="PreventiX Advanced API",
+    description="AI-powered health risk prediction with personalized recommendations",
     version="2.1.0"
 )
 
-# NOW add the exception handler
+# Validation exception handler
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     logger.error(f"Validation error: {exc.errors()}")
     logger.error(f"Body received: {exc.body}")
-    
     return JSONResponse(
         status_code=422,
         content={
@@ -51,29 +54,29 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         }
     )
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize FastAPI app
-app = FastAPI(
-    title="PreventiX Advanced API - Optimized",
-    description="AI-powered health risk prediction with personalized recommendations (Anti-overfitting optimized)",
-    version="2.1.0"
-)
-
 # Enable CORS
+# Use explicit origins from env var when deploying to production.
+# IMPORTANT: allow_origins=["*"] is incompatible with allow_credentials=True per CORS spec.
+# With wildcard origins we must set allow_credentials=False.
+_cors_origins_env = os.getenv("BACKEND_CORS_ORIGINS", "")
+_allowed_origins = (
+    [o.strip() for o in _cors_origins_env.split(",") if o.strip()]
+    if _cors_origins_env
+    else ["*"]
+)
+_use_credentials = "*" not in _allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_allowed_origins,
+    allow_credentials=_use_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include authentication router
+# Include routers
 app.include_router(auth_router)
-app.include_router(tracking_router) 
+app.include_router(tracking_router)
 
 # Global variables for models and preprocessors
 diabetes_model = None

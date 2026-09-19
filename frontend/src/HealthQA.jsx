@@ -86,10 +86,10 @@ const HealthQA = ({ healthData, onClose }) => {
 
   const getConfidenceColor = (confidence) => {
     switch (confidence) {
-      case 'High': return 'text-green-600 bg-green-50 border-green-200';
-      case 'Moderate': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'Low': return 'text-orange-600 bg-orange-50 border-orange-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      case 'High': return 'text-green-600 bg-green-50 border-green-200 dark:text-green-200 dark:bg-green-900/30 dark:border-green-700';
+      case 'Moderate': return 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:text-yellow-200 dark:bg-yellow-900/30 dark:border-yellow-700';
+      case 'Low': return 'text-orange-600 bg-orange-50 border-orange-200 dark:text-orange-200 dark:bg-orange-900/30 dark:border-orange-700';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600';
     }
   };
 
@@ -104,16 +104,16 @@ const HealthQA = ({ healthData, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <MessageCircle className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Ask About Your Health Report</h2>
+            <MessageCircle className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Ask About Your Health Report</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             ✕
           </button>
@@ -123,15 +123,15 @@ const HealthQA = ({ healthData, onClose }) => {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {conversation.length === 0 ? (
             <div className="text-center py-8">
-              <Bot className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Ask Me Anything About Your Health</h3>
-              <p className="text-gray-600 mb-6">
+              <Bot className="w-16 h-16 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Ask Me Anything About Your Health</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 I can help explain your health assessment results, provide personalized recommendations, 
                 and answer questions about your risk factors.
               </p>
               {(!healthData || Object.keys(healthData).length === 0) && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-blue-800 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-6">
+                  <p className="text-blue-800 dark:text-blue-200 text-sm">
                     💡 I can provide general health information. For personalized advice, complete a health assessment first.
                   </p>
                 </div>
@@ -139,55 +139,55 @@ const HealthQA = ({ healthData, onClose }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-w-4xl mx-auto">
                 <button
                   onClick={() => setQuestion("What is my diabetes risk and how can I reduce it?")}
-                  className="p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   💡 "What is my diabetes risk and how can I reduce it?"
                 </button>
                 <button
                   onClick={() => setQuestion("How can I improve my blood pressure and heart health?")}
-                  className="p-3 text-left bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   ❤️ "How can I improve my blood pressure and heart health?"
                 </button>
                 <button
                   onClick={() => setQuestion("What diet changes should I make for better health?")}
-                  className="p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   🥗 "What diet changes should I make for better health?"
                 </button>
                 <button
                   onClick={() => setQuestion("What exercise routine is best for my health?")}
-                  className="p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   🏃 "What exercise routine is best for my health?"
                 </button>
                 <button
                   onClick={() => setQuestion("How can I improve my sleep and energy levels?")}
-                  className="p-3 text-left bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   😴 "How can I improve my sleep and energy levels?"
                 </button>
                 <button
                   onClick={() => setQuestion("How can I manage stress and improve my mental health?")}
-                  className="p-3 text-left bg-pink-50 hover:bg-pink-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-pink-50 dark:bg-pink-900/20 hover:bg-pink-100 dark:hover:bg-pink-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   🧠 "How can I manage stress and improve my mental health?"
                 </button>
                 <button
                   onClick={() => setQuestion("What lifestyle changes should I make for better health?")}
-                  className="p-3 text-left bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   🏠 "What lifestyle changes should I make for better health?"
                 </button>
                 <button
                   onClick={() => setQuestion("Do I need any medications or supplements?")}
-                  className="p-3 text-left bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   💊 "Do I need any medications or supplements?"
                 </button>
                 <button
                   onClick={() => setQuestion("What symptoms should I watch for?")}
-                  className="p-3 text-left bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors text-sm"
+                  className="p-3 text-left bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-lg transition-colors text-sm text-gray-900 dark:text-white"
                 >
                   🚨 "What symptoms should I watch for?"
                 </button>
@@ -207,8 +207,8 @@ const HealthQA = ({ healthData, onClose }) => {
                     message.type === 'user' 
                       ? 'bg-blue-600 text-white' 
                       : message.type === 'error'
-                      ? 'bg-red-50 text-red-800 border border-red-200'
-                      : 'bg-gray-50 text-gray-900'
+                      ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700'
+                      : 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white'
                   }`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     
@@ -222,11 +222,11 @@ const HealthQA = ({ healthData, onClose }) => {
                         
                         {/* Related Factors */}
                         {message.relatedFactors && message.relatedFactors.length > 0 && (
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <h4 className="text-sm font-semibold text-blue-900 mb-2">Related Factors:</h4>
+                          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                            <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">Related Factors:</h4>
                             <div className="flex flex-wrap gap-2">
                               {message.relatedFactors.map((factor, idx) => (
-                                <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                <span key={idx} className="px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs rounded-full">
                                   {factor}
                                 </span>
                               ))}
@@ -236,28 +236,28 @@ const HealthQA = ({ healthData, onClose }) => {
                         
                         {/* Follow-up Suggestions */}
                         {message.followUpSuggestions && message.followUpSuggestions.length > 0 && (
-                          <div className="bg-green-50 p-3 rounded-lg">
-                            <h4 className="text-sm font-semibold text-green-900 mb-2 flex items-center gap-2">
+                          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                            <h4 className="text-sm font-semibold text-green-900 dark:text-green-200 mb-2 flex items-center gap-2">
                               <Lightbulb className="w-4 h-4" />
                               Suggestions:
                             </h4>
                             <ul className="space-y-1">
                               {message.followUpSuggestions.map((suggestion, idx) => (
-                                <li key={idx} className="text-sm text-green-800">• {suggestion}</li>
+                                <li key={idx} className="text-sm text-green-800 dark:text-green-200">• {suggestion}</li>
                               ))}
                             </ul>
                           </div>
                         )}
                         
                         {/* Disclaimer */}
-                        <div className="text-xs text-gray-500 italic mt-3 p-2 bg-gray-100 rounded">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 italic mt-3 p-2 bg-gray-100 dark:bg-gray-600 rounded">
                           {message.disclaimer}
                         </div>
                       </div>
                     )}
                   </div>
                   
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {message.timestamp.toLocaleTimeString()}
                   </div>
                 </div>
@@ -276,10 +276,10 @@ const HealthQA = ({ healthData, onClose }) => {
               <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
               </div>
-              <div className="bg-gray-50 p-4 rounded-2xl">
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                  <span className="text-gray-600">Analyzing your question...</span>
+                  <span className="text-gray-600 dark:text-gray-300">Analyzing your question...</span>
                 </div>
               </div>
             </div>
@@ -287,14 +287,14 @@ const HealthQA = ({ healthData, onClose }) => {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-200 p-6">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-6">
           <form onSubmit={handleSubmit} className="flex gap-3">
             <input
               type="text"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask me anything about your health assessment..."
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               disabled={loading}
             />
             <button

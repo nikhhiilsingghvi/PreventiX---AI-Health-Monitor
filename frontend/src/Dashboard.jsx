@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import { useGamification } from './GamificationContext';
 import SettingsModal from './SettingsModal';
 import RecentAssessments from './RecentAssessments';
+import RewardsDisplay from './RewardsDisplay';
+import GoalsTracker from './GoalsTracker';
 import { recentAssessments } from './api';
-import { Heart, Activity, TrendingUp, Calendar, User, LogOut, BarChart3, Bell, Settings, Plus, ChevronRight, Droplet, Zap } from 'lucide-react';
+import { Heart, Activity, TrendingUp, Calendar, User, LogOut, BarChart3, Bell, Settings, Plus, ChevronRight, Droplet, Zap, Trophy, Target } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const { addPoints, completeGoal, updateStreak } = useGamification();
   const [activeTab, setActiveTab] = useState('overview');
   const [showSettings, setShowSettings] = useState(false);
   const [assessments, setAssessments] = useState([]);
@@ -34,6 +38,14 @@ const Dashboard = () => {
         
         if (data.length > 0) {
           calculateStats(data);
+          // Award points for assessment completion (only once per session)
+          const hasAwardedPoints = sessionStorage.getItem('dashboardPointsAwarded');
+          if (!hasAwardedPoints) {
+            addPoints(100, 'Completed health assessment', 'assessment');
+            completeGoal('assessments');
+            updateStreak();
+            sessionStorage.setItem('dashboardPointsAwarded', 'true');
+          }
         }
       } catch (error) {
         console.error('Failed to fetch assessments:', error);
@@ -43,7 +55,7 @@ const Dashboard = () => {
     };
 
     fetchAssessments();
-  }, []);
+  }, []); // Remove dependencies to prevent infinite loop
 
   const calculateStats = (assessmentData) => {
     if (assessmentData.length === 0) return;
@@ -299,121 +311,147 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Trend Graphs Section */}
-        {assessments && assessments.length > 1 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Health Trends Over Time</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Diabetes Trend */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Droplet className="w-5 h-5 text-green-600" />
-                  <span className="font-medium text-gray-900 dark:text-white">Diabetes Risk Trend</span>
+        {/* Health Insights & Action Items */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Health Insights & Action Items</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* Risk Assessment Summary */}
+            <div className="bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-red-100 dark:bg-red-800 rounded-lg">
+                  <Activity className="w-5 h-5 text-red-600 dark:text-red-400" />
                 </div>
-                <div className="h-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-end gap-1">
-                  {assessments && assessments.slice(0, 5).reverse().map((assessment, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-green-500 rounded-t"
-                        style={{ 
-                          height: `${((assessment.diabetes_risk || 0) / 100) * 100}px`,
-                          minHeight: '4px'
-                        }}
-                      ></div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {assessment.date ? 
-                          new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
-                          'N/A'
-                        }
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <h4 className="font-semibold text-red-900 dark:text-red-200">Risk Assessment</h4>
               </div>
+              <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                {stats.diabetesRisk > 0.5 || stats.hypertensionRisk > 0.5 
+                  ? "High risk detected in key areas. Immediate attention recommended."
+                  : stats.diabetesRisk > 0.25 || stats.hypertensionRisk > 0.25
+                  ? "Moderate risk levels. Preventive measures advised."
+                  : "Low risk levels. Maintain current healthy habits."
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/assessment')}
+                className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Take Action
+              </button>
+            </div>
 
-              {/* Hypertension Trend */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-red-600" />
-                  <span className="font-medium text-gray-900 dark:text-white">Hypertension Risk Trend</span>
+            {/* Health Score Analysis */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
+                  <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <div className="h-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-end gap-1">
-                  {assessments && assessments.slice(0, 5).reverse().map((assessment, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-red-500 rounded-t"
-                        style={{ 
-                          height: `${((assessment.hypertension_risk || 0) / 100) * 100}px`,
-                          minHeight: '4px'
-                        }}
-                      ></div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {assessment.date ? 
-                          new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
-                          'N/A'
-                        }
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-200">Health Scores</h4>
               </div>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                {stats.metabolicScore > 80 && stats.cardiovascularScore > 80
+                  ? "Excellent health scores! Keep up the great work."
+                  : stats.metabolicScore > 60 && stats.cardiovascularScore > 60
+                  ? "Good health scores with room for improvement."
+                  : "Health scores need attention. Focus on lifestyle improvements."
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/health-trends-3d')}
+                className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                View Details
+              </button>
+            </div>
 
-              {/* Metabolic Health Trend */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium text-gray-900 dark:text-white">Metabolic Health Trend</span>
+            {/* Improvement Opportunities */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-green-100 dark:bg-green-800 rounded-lg">
+                  <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
-                <div className="h-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-end gap-1">
-                  {assessments && assessments.slice(0, 5).reverse().map((assessment, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-blue-500 rounded-t"
-                        style={{ 
-                          height: `${(assessment.metabolic_health_score || 0)}px`,
-                          minHeight: '4px'
-                        }}
-                      ></div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {assessment.date ? 
-                          new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
-                          'N/A'
-                        }
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <h4 className="font-semibold text-green-900 dark:text-green-200">Improvement Areas</h4>
               </div>
+              <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+                {stats.diabetesImprovement > 0 || stats.hypertensionImprovement > 0
+                  ? "Great progress! You're improving in key health areas."
+                  : "Focus on nutrition, exercise, and sleep for better health outcomes."
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/tracking')}
+                className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Track Progress
+              </button>
+            </div>
 
-              {/* Cardiovascular Health Trend */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium text-gray-900 dark:text-white">Cardiovascular Health Trend</span>
+            {/* Personalized Recommendations */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-purple-100 dark:bg-purple-800 rounded-lg">
+                  <Heart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <div className="h-32 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 flex items-end gap-1">
-                  {assessments && assessments.slice(0, 5).reverse().map((assessment, index) => (
-                    <div key={index} className="flex-1 flex flex-col items-center">
-                      <div 
-                        className="w-full bg-purple-500 rounded-t"
-                        style={{ 
-                          height: `${(assessment.cardiovascular_health_score || 0)}px`,
-                          minHeight: '4px'
-                        }}
-                      ></div>
-                      <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {assessment.date ? 
-                          new Date(assessment.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) :
-                          'N/A'
-                        }
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <h4 className="font-semibold text-purple-900 dark:text-purple-200">Personalized Tips</h4>
               </div>
+              <p className="text-sm text-purple-700 dark:text-purple-300 mb-3">
+                {stats.diabetesRisk > 0.5 
+                  ? "Focus on blood sugar management through diet and exercise."
+                  : stats.hypertensionRisk > 0.5
+                  ? "Prioritize heart health with cardio exercise and low-sodium diet."
+                  : "Maintain balanced nutrition and regular physical activity."
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/assessment')}
+                className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Get Advice
+              </button>
+            </div>
+
+            {/* Health Goals */}
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-800 rounded-lg">
+                  <Zap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <h4 className="font-semibold text-amber-900 dark:text-amber-200">Weekly Goals</h4>
+              </div>
+              <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                Set achievable weekly targets for exercise, nutrition, and sleep to improve your health scores.
+              </p>
+              <button 
+                onClick={() => navigate('/tracking')}
+                className="text-xs bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Set Goals
+              </button>
+            </div>
+
+            {/* Health Alerts */}
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-lg">
+                  <Bell className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                </div>
+                <h4 className="font-semibold text-orange-900 dark:text-orange-200">Health Alerts</h4>
+              </div>
+              <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                {stats.diabetesRisk > 0.75 || stats.hypertensionRisk > 0.75
+                  ? "High risk alert! Consider consulting a healthcare professional."
+                  : "Regular monitoring recommended. Stay consistent with health assessments."
+                }
+              </p>
+              <button 
+                onClick={() => navigate('/assessment')}
+                className="text-xs bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-lg transition-colors"
+              >
+                Monitor Health
+              </button>
             </div>
           </div>
-        )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
@@ -458,8 +496,8 @@ const Dashboard = () => {
                     <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="text-left flex-1">
-                    <p className="font-semibold text-gray-900 dark:text-white">3D Health Trends</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Interactive 3D visualization</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">Health Trends</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Interactive 2D line charts</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -473,6 +511,10 @@ const Dashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Gamification Components */}
+            <RewardsDisplay />
+            <GoalsTracker />
+
             {/* Recommendations */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Recommendations</h2>

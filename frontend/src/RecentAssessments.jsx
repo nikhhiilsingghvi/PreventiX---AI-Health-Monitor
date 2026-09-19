@@ -8,10 +8,11 @@ const RecentAssessments = ({ limit = 10, showViewAll = true }) => {
   const navigate = useNavigate();
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     fetchRecentAssessments();
-  }, [limit]);
+  }, [limit]); // Only re-run when limit changes
 
   // Add a refresh function that can be called externally
   const refreshAssessments = () => {
@@ -19,7 +20,14 @@ const RecentAssessments = ({ limit = 10, showViewAll = true }) => {
   };
 
   const fetchRecentAssessments = async () => {
+    // Prevent multiple simultaneous calls
+    if (isFetching) {
+      console.log('Already fetching, skipping...');
+      return;
+    }
+
     try {
+      setIsFetching(true);
       setLoading(true);
       console.log('Fetching recent assessments...');
       
@@ -28,6 +36,8 @@ const RecentAssessments = ({ limit = 10, showViewAll = true }) => {
       if (!token) {
         console.log('No authentication token found');
         setAssessments([]);
+        setLoading(false);
+        setIsFetching(false);
         return;
       }
       
@@ -50,6 +60,7 @@ const RecentAssessments = ({ limit = 10, showViewAll = true }) => {
       setAssessments([]);
     } finally {
       setLoading(false);
+      setIsFetching(false);
     }
   };
 

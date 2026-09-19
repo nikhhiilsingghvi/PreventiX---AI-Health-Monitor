@@ -24,7 +24,5 @@ shap==0.43.0
 # Pydantic
 pydantic[email]==2.5.0
 
-# Logging
-logging==0.4.9.6
-
+# PDF Generation
 reportlab==4.0.7
